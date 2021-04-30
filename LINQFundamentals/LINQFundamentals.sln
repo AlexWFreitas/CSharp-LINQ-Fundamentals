@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Introduction", "Introduction\Introduction.csproj", "{4F3FBF3D-170E-460A-AF3E-BD8BED126A2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Introduction", "Introduction\Introduction.csproj", "{4F3FBF3D-170E-460A-AF3E-BD8BED126A2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Features", "Features\Features.csproj", "{F1775668-B7E8-4ED3-99DA-B65DA84BA65A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Features", "Features\Features.csproj", "{F1775668-B7E8-4ED3-99DA-B65DA84BA65A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{EE9C3DFA-4049-49AB-A059-664AB80D9DD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F1775668-B7E8-4ED3-99DA-B65DA84BA65A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1775668-B7E8-4ED3-99DA-B65DA84BA65A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1775668-B7E8-4ED3-99DA-B65DA84BA65A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE9C3DFA-4049-49AB-A059-664AB80D9DD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE9C3DFA-4049-49AB-A059-664AB80D9DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE9C3DFA-4049-49AB-A059-664AB80D9DD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE9C3DFA-4049-49AB-A059-664AB80D9DD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
