@@ -34,7 +34,7 @@ namespace Features
                 new Employee { Id = 3, Name = "Alex" }
             };
 
-            IEnumerator<Employee> enumerator = developers.GetEnumerator();
+            var enumerator = developers.GetEnumerator();
 
             while (enumerator.MoveNext())
             {
@@ -43,9 +43,12 @@ namespace Features
 
             Console.WriteLine($"Number of developers: {developers.Count()}");
 
-            Console.WriteLine("Developers with names that start with S:");
+            Console.WriteLine("\nDevelopers ordered alphabetically only with names with exactly 5 letters:");
 
-            foreach (var employee in developers.Where(e => e.Name.StartsWith('S')))
+            var query = developers.Where(e => e.Name.Length == 5).
+                                                OrderBy(e => e.Name);
+
+            foreach (var employee in query)
                 Console.WriteLine(employee.Name);
         }
     }
