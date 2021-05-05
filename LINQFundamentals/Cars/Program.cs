@@ -10,13 +10,39 @@ namespace Cars
         static void Main(string[] args)
         {
             var cars = ProcesssCars("fuel.csv");
-            var manufacturers = ProcesssManufacturers("manufacturer.csv");
+            var manufacturers = ProcesssManufacturers("manufacturers.csv");
 
-            var query =
-                    cars.Where(car => (car.Manufacturer == "BMW" && car.Year == 2016))
+            var querySyntax = 
+                        from car in cars
+                        join manufacturer in manufacturers 
+                            on car.Manufacturer equals manufacturer.Name
+                        orderby car.Combined descending, car.Name ascending
+                        select new
+                        {
+                            manufacturer.Headquarters,
+                            car.Name,
+                            car.Combined
+                        };
+
+            var methodSyntax =
+                    cars
+                        .Join(manufacturers,
+                                car => car.Manufacturer,
+                                manufacturer => manufacturer.Name,
+                                (car, manufacturer) => new
+                                {
+                                    manufacturer.Headquarters,
+                                    car.Name,
+                                    car.Combined
+                                })
                         .OrderByDescending(car => car.Combined)
-                        .ThenBy(car => car.Name)
-                        .Select(car => new { car.Manufacturer, car.Name, car.Combined });
+                        .ThenBy(car => car.Name);
+
+            foreach (var car in methodSyntax.Take(10))
+            {
+                Console.WriteLine($"{car.Headquarters} {car.Name} : {car.Combined}");
+            }
+
         }
 
         private static List<Car> ProcesssCars(string path)
@@ -25,7 +51,22 @@ namespace Cars
                 File.ReadAllLines(path)
                     .Skip(1)
                     .Where(line => line.Length > 1)
-                    .ToCar();
+                    .Select(line =>
+                    {
+                        var columns = line.Split(',');
+                        return new Car
+                        {
+                            Year = int.Parse(columns[0]),
+                            Manufacturer = columns[1],
+                            Name = columns[2],
+                            Displacement = double.Parse(columns[3]),
+                            Cylinders = int.Parse(columns[4]),
+                            City = int.Parse(columns[5]),
+                            Highway = int.Parse(columns[6]),
+                            Combined = int.Parse(columns[7])
+                        };
+
+                    });
             return query.ToList();
         }
 
