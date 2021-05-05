@@ -9,44 +9,40 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            //    Proof that extension methods are called through instances and are not able to be called through Class even though they are static methods
-            // string x = "Hello World";
-            // x.DefCon();
-            // String.DefCon(x); // Error
-            // StringExtensions.DefCon(x);
+            // Proof that extension methods are called through instances and are not able to be called through Class even though they are static methods
+            string x = "Hello World";
+            x.WriteTest();
+            StringExtensions.WriteTest(x);
+            // String.DefCon(x); // Error - You should call extension methods either by the class name or by the instance of object.
+
 
             // Creates a delegate named square that contains the anonymous-method(int x) { return x * x; }
-            // Func<int, int> square = x => x * x;
+            Func<int, int> square = x => x * x;
+            Console.WriteLine(square(2));
 
-            // WriteHelloWorldForEachElement(23);
-            // Console.WriteLine(square(2));
 
-            // IEnumerable<string> listaString = new string[] { "a", "b", "c" };
 
+            // Tests below are related to testing how lambda expressions interact with methods that accept delegates.
+            // Defining some string lists for testing.
+            IEnumerable<string> listaString = new string[] { "a", "b", "c" };
             var stringLul = new List<string> { "ABCDEF", "213", "2343" };
             var stringLul2 = new string[] { "ABCZDDEF", "21213", "23434fadsf" };
 
-            List<int> y = stringLul.CloneSelect(x => StringExtensions.CloneSelector(x)).ToList();
+            // Debug shows how this method passes a value to x to use on the lambda expression.
+            List<int> y = stringLul.CloneSelectDifferent(x => StringExtensions.CloneSelector(x)).ToList();
             Console.WriteLine(y[0]);
-            // Code to test a fake Select using Generics.
-            //List<int> ListInt = stringLul.Select(x => 2).ToList();
-            //stringLul.SelectFake(l => StringExtensions.WriteHello(l));
-            //stringLul.SelectFake(StringExtensions.WriteHello);
-            //stringLul.SelectFake(l => StringExtensions.WriteHello(l));
-            List<int> z = stringLul.CloneSelect(x => StringExtensions.CloneSelector(x)).ToList();
 
-            // stringLul.SelectFake(l => l);
+            // Code to test a fake Select using Generics. ( Previous version )
+            stringLul.SelectFake(l => StringExtensions.WriteHello(l));
+            stringLul.SelectFake(StringExtensions.WriteHello);
 
-            //stringLul.Select();
+            // Since Select enumerates the number of elements in stringLul.
+            // listInt receives 3 elements of value 2.
+            List<int> listInt = stringLul.Select(x => 2).ToList();
 
-            // Code to prove that Generics aren't enumerating by itself.
-            // stringLul.SelectFakeWithLessGenerics(StringExtensions.WriteHelloWithoutGenerics);
-            // stringLul.SelectFakeWithLessGenerics(l => StringExtensions.WriteHelloWithoutGenerics(l));
-        }
-
-        public static void WriteHelloWorldForEachElement<T>(T element)
-        {
-            Console.WriteLine("hello");
+            // Code to prove that the enumeration doesn't happen because of generic method signature.
+            stringLul.SelectFakeWithLessGenerics(StringExtensions.WriteHelloWithoutGenerics);
+            stringLul.SelectFakeWithLessGenerics(l => StringExtensions.WriteHelloWithoutGenerics(l));
         }
     }
 }

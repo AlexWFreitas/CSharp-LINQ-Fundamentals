@@ -13,7 +13,7 @@ namespace Cars
         public int Highway { get; set; }
         public int Combined { get; set; }
 
-        internal static Car ParseFromCsv(string line)
+        /*internal static Car ParseFromCsv(string line)
         {
             var columns = line.Split(',');
 
@@ -28,6 +28,6 @@ namespace Cars
                 Highway = int.Parse(columns[6]),
                 Combined = int.Parse(columns[7])
             };
-        }
+        }*/
     }
 }

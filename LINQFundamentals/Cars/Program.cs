@@ -23,6 +23,18 @@ namespace Cars
                 orderby car.Combined descending, car.Name ascending
                 select car;
 
+            var queryAnonymousType =
+                    cars.Where(car => (car.Manufacturer == "BMW" && car.Year == 2016))
+                        .OrderByDescending(car => car.Combined)
+                        .ThenBy(car => car.Name)
+                        .Select(car => new
+                        {
+                            car.Manufacturer,
+                            car.Name,
+                            car.Combined
+                        });
+
+
             var top =
                     cars.OrderByDescending(car => car.Combined)
                         .ThenBy(car => car.Name)
@@ -31,15 +43,24 @@ namespace Cars
 
             var result = cars.Any(c => c.Manufacturer == "Ford");
 
-            Console.WriteLine(result);
+            var charList = cars
+                        .SelectMany(c => c.Name)
+                        .OrderBy(c => c);
 
-            foreach (var car in query.Take(10))
+            foreach (var character in charList)
+            {
+                Console.WriteLine(character);
+            }
+
+            /*Console.WriteLine(result);*/
+
+            /*foreach (var car in queryAnonymousType.Take(10))
             {
                 Console.WriteLine($"{car.Manufacturer} {car.Name} : {car.Combined}");
-            }
+            }*/
         }
 
-        private static List<Car> ProcesssFile2(string path)
+        /*private static List<Car> ProcesssFile2(string path)
         {
             var query =
                 File.ReadAllLines(path)
@@ -48,7 +69,7 @@ namespace Cars
                     .Select(Car.ParseFromCsv)
                     .ToList();
             return query.ToList();
-        }
+        }*/
 
         private static List<Car> ProcesssFile(string path)
         {
