@@ -13,34 +13,47 @@ namespace Cars
             var manufacturers = ProcesssManufacturers("manufacturers.csv");
 
             var querySyntax =
-                from car in cars
-                group car by car.Manufacturer.ToUpper() into manufacturer
-                orderby manufacturer.Key
-                select manufacturer;
-                
+                from manufacturer in manufacturers
+                join car in cars
+                                on
+                                new { Manufacturer = manufacturer.Name, manufacturer.Year }
+                                equals
+                                new { car.Manufacturer, car.Year }
+                                into carGroup
+                orderby manufacturer.Name ascending
+                select new
+                {
+                    Manufacturer = manufacturer,
+                    Cars = carGroup
+                };
 
             var methodSyntax =
-                cars
-                .GroupBy(c => c.Manufacturer.ToUpper())
-                .OrderBy(g => g.Key);
+                manufacturers
+                .GroupJoin(
+                            cars ,
+                            m => new { Manufacturer = m.Name, m.Year },
+                            c => new { c.Manufacturer, c.Year },
+                            (m, c) => new { Manufacturer = m, Cars = c }
+                            )
+                .OrderBy(g => g.Manufacturer.Name);
 
-            foreach (var carGroup in methodSyntax)
+            foreach (var aGroup in querySyntax)
             {
-                Console.WriteLine($"{carGroup.Key} has { carGroup.Count()} cars.");
 
-                var querySyntaxTwoCars =
-                    from car in carGroup
-                    orderby car.Combined descending, car.Name ascending
-                    select car;
+                var queryFuelTakeTwo = 
+                    aGroup
+                    .Cars
+                    .OrderByDescending(c => c.Combined).Take(2);
 
-                var methodSyntaxTwoCars =
-                    carGroup
-                    .OrderByDescending(c => c.Combined)
-                    .ThenBy(c => c.Name);
+                var querySyntaxFuelTakeTwo =
+                    (from car in aGroup.Cars
+                     orderby car.Combined descending
+                     select car).Take(2);
 
-                foreach (var car in methodSyntaxTwoCars.Take(2))
+                Console.WriteLine($"{aGroup.Manufacturer.Name} : {aGroup.Manufacturer.Headquarters}");
+                foreach (var car in queryFuelTakeTwo)
                 {
-                    Console.WriteLine($"\t{car.Manufacturer} {car.Name} : {car.Combined}");
+                    Console.WriteLine($"\t{car.Name} : {car.Combined}");
                 }
             }
 
