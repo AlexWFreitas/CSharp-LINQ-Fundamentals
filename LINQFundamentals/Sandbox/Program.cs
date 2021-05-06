@@ -16,6 +16,12 @@ namespace Sandbox
             // String.DefCon(x); // Error - You should call extension methods either by the class name or by the instance of object.
 
 
+            // Aggregate example with simple code.
+            var listInt = new List<int> { 1, 2, 3, 4, 5 };
+
+            var sumTimesTwo = listInt.Aggregate(new int(), (acc, value) => acc + value, acc => acc * 2);
+
+
             // Creates a delegate named square that contains the anonymous-method(int x) { return x * x; }
             Func<int, int> square = x => x * x;
             Console.WriteLine(square(2));
