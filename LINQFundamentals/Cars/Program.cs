@@ -12,46 +12,45 @@ namespace Cars
             var cars = ProcesssCars("fuel.csv");
             var manufacturers = ProcesssManufacturers("manufacturers.csv");
 
-            var querySyntax =
+            var challengeQuerySyntax =
                 from manufacturer in manufacturers
                 join car in cars
-                                on
-                                new { Manufacturer = manufacturer.Name, manufacturer.Year }
-                                equals
-                                new { car.Manufacturer, car.Year }
-                                into carGroup
-                orderby manufacturer.Name ascending
-                select new
-                {
-                    Manufacturer = manufacturer,
-                    Cars = carGroup
-                };
+                    on manufacturer.Name equals car.Manufacturer
+                    into carGroup
+                select 
+                    new
+                    {
+                        Manufacturer = manufacturer,
+                        Cars = carGroup
+                    } 
+                    into result
+                group result by result.Manufacturer.Headquarters;
 
-            var methodSyntax =
+            var challengeQuery =
                 manufacturers
-                .GroupJoin(
-                            cars ,
-                            m => new { Manufacturer = m.Name, m.Year },
-                            c => new { c.Manufacturer, c.Year },
-                            (m, c) => new { Manufacturer = m, Cars = c }
-                            )
-                .OrderBy(g => g.Manufacturer.Name);
+                .GroupJoin(cars, m => m.Name, c => c.Manufacturer, (m, c) => new
+                {
+                    Manufacturer = m,
+                    Cars = c
+                });
 
-            foreach (var aGroup in querySyntax)
+            var challengeQuery2 =
+                challengeQuery
+                .GroupBy(m => m.Manufacturer.Headquarters)
+                .OrderBy(o => o.Key);
+
+
+            foreach (var groupOfCarsByCountry in challengeQuery2)
             {
+                Console.WriteLine($"{groupOfCarsByCountry.Key}");
 
-                var queryFuelTakeTwo = 
-                    aGroup
-                    .Cars
-                    .OrderByDescending(c => c.Combined).Take(2);
+                var queryCars =
+                    groupOfCarsByCountry
+                    .SelectMany(g => g.Cars) // Flattening the Manufacturers
+                    .OrderByDescending(c => c.Combined)
+                    .Take(3);
 
-                var querySyntaxFuelTakeTwo =
-                    (from car in aGroup.Cars
-                     orderby car.Combined descending
-                     select car).Take(2);
-
-                Console.WriteLine($"{aGroup.Manufacturer.Name} : {aGroup.Manufacturer.Headquarters}");
-                foreach (var car in queryFuelTakeTwo)
+                foreach (var car in queryCars)
                 {
                     Console.WriteLine($"\t{car.Name} : {car.Combined}");
                 }
