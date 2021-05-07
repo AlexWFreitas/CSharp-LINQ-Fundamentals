@@ -10,33 +10,42 @@ namespace Cars
     {
         static void Main(string[] args)
         {
+            CreateXml();
+            QueryXml("fuel.xml");
+        }
+
+        private static void QueryXml(string path)
+        {
+            var document = XDocument.Load(path);
+
+            var query =
+                document
+                .Element("Cars")
+                .Elements("Car")
+                .Where(c => c.Attribute("Manufacturer").Value == "BMW")
+                .Select(c => c.Attribute("Name").Value);
+
+            foreach (var name in query)
+            {
+                Console.WriteLine(name);
+            }
+
+        }
+
+        private static void CreateXml()
+        {
             var records = ProcesssCars("fuel.csv");
 
             var document = new XDocument();
-            var cars = new XElement("Cars");
 
-            // Even easier way of creating Car XElements
-            var elements =
-                records
-                .Select(c => new XElement( "Car", 
-                                new XAttribute("Name", c.Name),
-                                new XAttribute("Combined", c.Combined),
-                                new XAttribute("Manufacturer", c.Manufacturer)));
+            var cars = new XElement("Cars",
 
+                        records.Select(c => new XElement("Car",
+                            new XAttribute("Name", c.Name),
+                            new XAttribute("Combined", c.Combined),
+                            new XAttribute("Manufacturer", c.Manufacturer))));
 
-
-            // Easier way of creating cars
-            foreach (var record in records)
-            {
-                var car = new XElement("Car", 
-                            new XAttribute("Name", record.Name), 
-                            new XAttribute("Combined", record.Combined), 
-                            new XAttribute("Manufacturer", record.Manufacturer));
-
-                cars.Add(car);
-            }
-
-            document.Add(elements);
+            document.Add(cars);
             document.Save("fuel.xml");
         }
 
