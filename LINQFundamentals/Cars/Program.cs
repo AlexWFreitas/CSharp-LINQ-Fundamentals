@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace Cars
 {
@@ -9,46 +10,34 @@ namespace Cars
     {
         static void Main(string[] args)
         {
-            var cars = ProcesssCars("fuel.csv");
-            var manufacturers = ProcesssManufacturers("manufacturers.csv");
+            var records = ProcesssCars("fuel.csv");
 
-            var query =
-                from car in cars
-                group car by car.Manufacturer into carGroup
-                select new
-                {
-                    Name = carGroup.Key,
-                    Max = carGroup.Max(c => c.Combined),
-                    Min = carGroup.Min(c => c.Combined),
-                    Average = carGroup.Average(c => c.Combined)
-                } into result
-                orderby result.Max descending
-                select result;
+            var document = new XDocument();
+            var cars = new XElement("Cars");
 
-            var query2 =
-                cars
-                .GroupBy(c => c.Manufacturer)
-                .Select(g =>
-                {
-                    var results = g.Aggregate(new CarStatistics(),
-                                        (acc, c) => acc.Accumulate(c),
-                                        acc => acc.Compute());
-                    return new
-                    {
-                        Name = g.Key,
-                        results.Max,
-                        results.Min,
-                        results.Average
-                    };
-                });
+            // Even easier way of creating Car XElements
+            var elements =
+                records
+                .Select(c => new XElement( "Car", 
+                                new XAttribute("Name", c.Name),
+                                new XAttribute("Combined", c.Combined),
+                                new XAttribute("Manufacturer", c.Manufacturer)));
 
-            foreach (var result in query2)
+
+
+            // Easier way of creating cars
+            foreach (var record in records)
             {
-                Console.WriteLine($"{result.Name}");
-                Console.WriteLine($"\tMax: {result.Max}");
-                Console.WriteLine($"\tMin: {result.Min}");
-                Console.WriteLine($"\tAvg: {result.Average, 0:F0}");
+                var car = new XElement("Car", 
+                            new XAttribute("Name", record.Name), 
+                            new XAttribute("Combined", record.Combined), 
+                            new XAttribute("Manufacturer", record.Manufacturer));
+
+                cars.Add(car);
             }
+
+            document.Add(elements);
+            document.Save("fuel.xml");
         }
 
         private static List<Car> ProcesssCars(string path)
