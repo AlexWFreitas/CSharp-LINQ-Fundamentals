@@ -16,35 +16,40 @@ namespace Cars
 
         private static void QueryXml(string path)
         {
+            var ns = (XNamespace)"http://www.otaru.com/cars/2016";
+            var ex = (XNamespace)"http://www.otaru.com/cars/2016/ex";
             var document = XDocument.Load(path);
 
             var query =
                 document
-                .Element("Cars")
-                .Elements("Car")
-                .Where(c => c.Attribute("Manufacturer").Value == "BMW")
-                .Select(c => c.Attribute("Name").Value);
+                ?.Element(ns + "Cars")
+                ?.Elements(ex + "Car") 
+                ?.Where(c => c.Attribute("Manufacturer")?.Value == "BMW")
+                ?.Select(c => c.Attribute("Name")?.Value) 
+                ?? Enumerable.Empty<string>();
 
             foreach (var name in query)
             {
                 Console.WriteLine(name);
             }
-
         }
 
         private static void CreateXml()
         {
             var records = ProcesssCars("fuel.csv");
-
+            var ns = (XNamespace)"http://www.otaru.com/cars/2016";
+            var ex = (XNamespace)"http://www.otaru.com/cars/2016/ex";
             var document = new XDocument();
 
-            var cars = new XElement("Cars",
+            var cars = new XElement(ns + "Cars",
 
-                        records.Select(c => new XElement("Car",
+                        records.Select(c => new XElement(ex + "Car",
                             new XAttribute("Name", c.Name),
                             new XAttribute("Combined", c.Combined),
-                            new XAttribute("Manufacturer", c.Manufacturer))));
+                            new XAttribute("Manufacturer", c.Manufacturer)))
+            );
 
+            cars.Add(new XAttribute(XNamespace.Xmlns + "ex", ex));
             document.Add(cars);
             document.Save("fuel.xml");
         }

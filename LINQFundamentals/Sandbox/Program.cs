@@ -44,7 +44,7 @@ namespace Sandbox
 
             // Since Select enumerates the number of elements in stringLul.
             // listInt receives 3 elements of value 2.
-            List<int> listInt = stringLul.Select(x => 2).ToList();
+            List<int> listInt2 = stringLul.Select(x => 2).ToList();
 
             // Code to prove that the enumeration doesn't happen because of generic method signature.
             stringLul.SelectFakeWithLessGenerics(StringExtensions.WriteHelloWithoutGenerics);
