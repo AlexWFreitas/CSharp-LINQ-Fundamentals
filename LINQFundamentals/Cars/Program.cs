@@ -12,17 +12,6 @@ namespace Cars
     {
         static void Main(string[] args)
         {
-            /*
-
-            Func<int, int> square = x => x * x;
-            Expression<Func<int, int, int>> add = (x, y) => x + y;
-
-            var result = add.Compile()(3, 5);
-            Console.WriteLine(result);
-            Console.WriteLine(add);
-
-            */
-
             Database.SetInitializer(new DropCreateDatabaseIfModelChanges<CarDb>());
             InsertData();
             QueryData();
@@ -35,15 +24,33 @@ namespace Cars
 
             var query =
                 db.Cars
-                .Where(c => c.Manufacturer == "BMW")
-                .OrderByDescending(c => c.Combined)
-                .ThenBy(c => c.Name)
-                .ToList()
-                .Take(10);
+                .GroupBy(c => c.Manufacturer)
+                .Select(g => new
+                {
+                    Name = g.Key,
+                    Cars =
+                    g.OrderByDescending(c => c.Combined)
+                    .Take(2)
+                });
 
-            foreach (var car in query)
+            var query2 =
+                from car in db.Cars
+                group car by car.Manufacturer into manufacturer
+                select new
+                {
+                    Name = manufacturer.Key,
+                    Cars = (from car in manufacturer
+                           orderby car.Combined descending
+                           select car).Take(2)
+                };
+
+            foreach (var group in query)
             {
-                Console.WriteLine($"{car.Name} : {car.Combined}");
+                Console.WriteLine($"{group.Name}");
+                foreach (var car in group.Cars)
+                {
+                    Console.WriteLine($"\t{car.Name} : {car.Combined}");
+                }
             }
         }
 
