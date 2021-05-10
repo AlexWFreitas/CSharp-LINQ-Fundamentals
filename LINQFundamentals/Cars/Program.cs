@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using System.Data.Entity;
 
 namespace Cars
 {
@@ -10,8 +11,44 @@ namespace Cars
     {
         static void Main(string[] args)
         {
-            CreateXml();
-            QueryXml("fuel.xml");
+            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<CarDb>());
+            InsertData();
+            QueryData();
+        }
+
+        private static void QueryData()
+        {
+            var db = new CarDb();
+            db.Database.Log = Console.WriteLine;
+
+            var query =
+                db.Cars
+                .Where(c => c.Manufacturer == "BMW")
+                .OrderByDescending(c => c.Combined)
+                .ThenBy(c => c.Name)
+                .Take(10);
+
+            foreach (var car in query)
+            {
+                Console.WriteLine($"{car.Name} : {car.Combined}");
+            }
+        }
+
+        private static void InsertData()
+        {
+            var cars = ProcessCars("fuel.csv");
+            var db = new CarDb();
+
+            db.Database.Log = Console.WriteLine;
+
+            if (!db.Cars.Any())
+            {
+                foreach (var car in cars)
+                {
+                    db.Cars.Add(car);
+                }
+                db.SaveChanges();
+            }
         }
 
         private static void QueryXml(string path)
@@ -36,7 +73,7 @@ namespace Cars
 
         private static void CreateXml()
         {
-            var records = ProcesssCars("fuel.csv");
+            var records = ProcessCars("fuel.csv");
             var ns = (XNamespace)"http://www.otaru.com/cars/2016";
             var ex = (XNamespace)"http://www.otaru.com/cars/2016/ex";
             var document = new XDocument();
@@ -54,7 +91,7 @@ namespace Cars
             document.Save("fuel.xml");
         }
 
-        private static List<Car> ProcesssCars(string path)
+        private static List<Car> ProcessCars(string path)
         {
             var query =
                 File.ReadAllLines(path)
